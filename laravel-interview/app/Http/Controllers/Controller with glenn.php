@@ -25,51 +25,78 @@ class Controller extends BaseController
         $type = $request->input('type');
         $numberOfAnimals = $request->input('numberOfAnimals');
 
-        return redirect("/$type/$numberOfAnimals");
+        return redirect("/$type");
     }
 
-    public function animals(Request $request, $type = null, $numberOfAnimals = 0)
+    public function animals(Request $request, $type = null, $numberOfAnimals = 0, $reverse = 'false')
     {
         $data = [];
         $split = [];
         $animals = self::allAnimals();
         $totalPrice = 0;
 
-        $IDs = array_keys(array_column(self::allAnimals(), 'type'), $type); // ex: [3, 4, 5, 6]
-
-        for ($i=0; $i<$numberOfAnimals; $i++) {
-            if (!isset($split[$IDs[$i%count($IDs)]])) {
-                $split[$IDs[$i%count($IDs)]] = 1;
+        if ($numberOfAnimals != 0) {
+            if ($reverse == 'true') {
+                foreach ($animals as $animal) {
+                    if ($animal['type'] != $type) {
+                        array_push($data, [
+                            $animal
+                        ]);
+                    }
+                }
             } else {
-                $split[$IDs[$i%count($IDs)]]++;
+                $IDs = array_keys(array_column(self::allAnimals(), 'type'), $type); // ex: [3, 4, 5, 6]
+
+                for ($i=0; $i<$numberOfAnimals; $i++) {
+                    if (!isset($split[$IDs[$i%count($IDs)]])) {
+                        $split[$IDs[$i%count($IDs)]] = 1;
+                    } else {
+                        $split[$IDs[$i%count($IDs)]]++;
+                    }
+                }
+
+                foreach ($split as $id => $quantity) {
+                    // $found = array_filter($animals,function($v,$k) use ($id){
+                    //     return $v['id'] == $id;},ARRAY_FILTER_USE_BOTH);
+
+                    array_push($data, [
+                    "id" => $animals[$id]['id'],
+                    "price" => $animals[$id]['price'],
+                    "type" => $type,
+                    'name' => $animals[$id]['name'],
+                    'quantity' => $quantity
+                ]);
+
+                    $totalPrice += $animals[$id]['price'] * $quantity;
+                }
             }
-        }
+         } else {
+             foreach ($animals as $animal) {
+                if ($animal['type'] == $type) {
+                    array_push($data, [
+                        $animal
+                    ]);
+                }
+                //  else {
+                //      if ($animal['type'] != $type) {
+                //          array_push($data, [
+                //         $animal
+                //     ]);
+                //      }
+                //  }
+             }
+         }
 
-        foreach ($split as $id => $quantity) {
-            // $found = array_filter($animals,function($v,$k) use ($id){
-            //     return $v['id'] == $id;},ARRAY_FILTER_USE_BOTH);
+        // $customers = DB::table('customers')->get();
 
-            array_push($data, [
-                "id" => $animals[$id]['id'],
-                "price" => $animals[$id]['price'],
-                "type" => $type,
-                'name' => $animals[$id]['name'],
-                'quantity' => $quantity
-            ]);
-
-            $totalPrice += $animals[$id]['price'] * $quantity;
-        }
-
-        $customers = DB::table('customers')->get();
-
-        // return response()->json(["data" => $data]);
-        return view('animals_select', [
-            'data' => $data, 
-            'type' => $type,
-            'numberOfAnimals' => $numberOfAnimals, 
-            'totalPrice' => $totalPrice,
-            'customers' => $customers
-        ]);
+        return response()->json(["data" => $data]);
+        // return view('animals_select', [
+        //     'data' => $data, 
+        //     'type' => $type,
+        //     'numberOfAnimals' => $numberOfAnimals, 
+        //     'totalPrice' => $totalPrice,
+        //     'customers' => $customers
+        // ]);
     }
 
     public function buy(Request $request)
@@ -90,7 +117,7 @@ class Controller extends BaseController
             'updated_at',
         ]));
 
-        return redirect('/transactions/index');
+        return redirect('/transactions');
     }
 
     private function allAnimals() : array

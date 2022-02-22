@@ -126,6 +126,14 @@
                         Laravel v{{ Illuminate\Foundation\Application::VERSION }} (PHP v{{ PHP_VERSION }})
                     </div>
                 </div>
+                <br>
+                <div align = "center">
+                    <?php
+                        echo Form::open(array('url' => "/farm", 'method' => 'get'));
+                        echo Form::submit('Start Farm');
+                        echo Form::close();
+                    ?>
+                </div>
             </div>
         </div>
     </body>
