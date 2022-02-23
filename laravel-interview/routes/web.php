@@ -17,13 +17,13 @@ use Illuminate\Support\Facades\Route;
 // Route::resource('/controller', Controller::class);
 // Route::resource('customers', 'App\Http\Controllers\CustomerController');
 
+Route::get('/', function () {return view('welcome');});
+Route::get('/farm', function() {return view('farm');});
+
 // Transaction
 Route::get('/transactions', 'App\Http\Controllers\TransactionController@index');
 Route::delete('/transaction/{id}', 'App\Http\Controllers\TransactionController@destroy');
 Route::get('/transaction/{id}', 'App\Http\Controllers\TransactionController@show');
-
-Route::get('/', function () {return view('welcome');});
-Route::get('/farm', function() {return view('farm');});
 
 // Customer
 Route::get('/customers', 'App\Http\Controllers\CustomerController@index');
@@ -37,8 +37,12 @@ Route::delete('/customer/{id}', 'App\Http\Controllers\CustomerController@destroy
 // Animal
 Route::get('/animals/index', 'App\Http\Controllers\Controller@index');
 Route::get('/animals', 'App\Http\Controllers\Controller@selectAnimals');
-Route::get('/{type?}/{numberOfAnimals?}/{reverse?}', 'App\Http\Controllers\Controller@animals')->name('request','type','numberOfAnimals','reverse');
+Route::get('/{type?}/{numberOfAnimals?}', 'App\Http\Controllers\Controller@animals')->name('request','type','numberOfAnimals');
 Route::post('/buy', 'App\Http\Controllers\Controller@buy');
+
+
+
+
 
 
 

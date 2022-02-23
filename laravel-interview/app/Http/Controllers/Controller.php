@@ -90,7 +90,7 @@ class Controller extends BaseController
             'updated_at',
         ]));
 
-        return redirect('/transactions/index');
+        return redirect('/transactions');
     }
 
     private function allAnimals() : array
